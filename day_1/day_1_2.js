@@ -1,32 +1,29 @@
 var fs = require('fs');
 fs.readFile('./day_1.dat', 'utf8', (err, data) => {
-  if (err) {
-    throw err; 
-  }
-  let count = 0;
-  const lines = data.split('\n');
-  lines.forEach((line) => {
-    if (line.length < 1) {
-      return;
-    }
+  let total = 0;
+  const lines = data.split('\r\n');
+  for (let line of lines) {
     // Hacky replacement for words
     // Can't do a naive swap because the letters might overlap
     // Ideally you'd replace the first and last instance of words as digits, 
     // but that would involve Effort 
-    line = line.replaceAll('one','o1e');
-    line = line.replaceAll('two','t2o');
-    line = line.replaceAll('three','t3e');
-    line = line.replaceAll('four','4');
-    line = line.replaceAll('five','5e');
-    line = line.replaceAll('six','6');
-    line = line.replaceAll('seven','7n');
-    line = line.replaceAll('eight','e8t');
-    line = line.replaceAll('nine','n9e');
-
+    const swapNums = {
+      'one':'o1e',
+      'two':'t2o',
+      'three':'t3e',
+      'four':'4',
+      'five':'5e',
+      'six':'6',
+      'seven':'7n',
+      'eight':'e8t',
+      'nine':'n9e',
+    };
+    for (const [num, rep] of Object.entries(swapNums)) {
+      line = line.replaceAll(num,rep);
+    };
     const digits = line.replace(/\D/g,'').split('');
-    const val = (parseInt(digits[0])*10) + (parseInt(digits[digits.length - 1]));
-    count = count + val;
-  });
+    total = total + (parseInt(digits[0])*10) + (parseInt(digits[digits.length - 1]));
+  };
 
-  console.log(`Answer: ${count}`);
+  console.log(`Answer: ${total}`);
 });
