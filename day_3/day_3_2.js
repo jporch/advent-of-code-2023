@@ -25,7 +25,7 @@ fs.readFile('./day_3.dat', 'utf8', (err, data) => {
   console.log(`Answer: ${total}`);
 });
 
-//#region Access adjacent cells
+
 class Coord {
   constructor(row=-1, col=-1) {
     this.row = row;
@@ -35,6 +35,7 @@ class Coord {
     return this.row >=0 && this.col >= 0 ? Grid[this.row][this.col] : '.';
   }
 
+  //#region Access adjacent cells
   NW() {
     if (this.row < 1 || this.col < 1) return new Coord();
     return new Coord(this.row-1,this.col-1);
@@ -74,8 +75,8 @@ class Coord {
     if (this.col < 1) return new Coord();
     return new Coord(this.row,this.col-1);
   }
+  //#endregion
 }
-//#endregion
 
 //#region Check contents of adjacent cells
 function isDigit(char) {
