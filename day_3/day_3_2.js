@@ -32,7 +32,7 @@ class Coord {
     this.col = col;
   }
   value() {
-    return this.row >=0 && this.col >= 0 ? Grid[this.row][this.col] : '.';
+    return (this.row >=0 && this.col >= 0) && (this.row < Grid.length && this.col < Grid[this.row].length) ? Grid[this.row][this.col] : '.';
   }
 
   //#region Access adjacent cells
