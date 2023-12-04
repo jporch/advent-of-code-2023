@@ -1,27 +1,25 @@
 var fs = require('fs');
+let partNums = new Map();
+let Grid;
+
+function makeGrid(data) {
+  let g = data.split('\r\n');
+  for (row in g) {
+    g[row] = g[row].split('');
+  }
+  return g;
+}
 
 fs.readFile('./day_3.dat', 'utf8', (err, data) => {
-  let map = data.split('\r\n');
-  let partNums = new Map();
-  for (row in map) {
-    map[row] = map[row].split('');
-  }
-  // Build a list of all numbers by their starting point
-  for (let row = 0; row < map.length; row++) {
-    for (let col = 0; col < map[row].length; col++) {
-      if (isDigit(map[row][col])) {
-        if (isAlreadyHandled(map,row,col)) continue;
-        partNums.set(`${row},${col}`,getNumber(map,row,col));
-      }
-    }
-  };
+  Grid = makeGrid(data);
 
   let total = 0;
   // Find all gears, determine how many numbers they touch, compute gear ratio
-  for (let row = 0; row < map.length; row++) {
-    for (let col = 0; col < map[row].length; col++) {
-      if (isGear(map[row][col])) {
-        const nums = adjacentNumbers(map,row,col);
+  for (let row = 0; row < Grid.length; row++) {
+    for (let col = 0; col < Grid[row].length; col++) {
+      let coord = new Coord(row,col);
+      if (isGear(coord.value())) {
+        const nums = adjacentNumbers(coord);
         if (nums.size === 2) {
           let val = 1;
           for (num of nums) {
@@ -36,44 +34,54 @@ fs.readFile('./day_3.dat', 'utf8', (err, data) => {
 });
 
 //#region Access adjacent cells
-function NW(map, row, col) {
-  if (row < 1 || col < 1) return '.';
-  return map[row-1][col-1];
-}
+class Coord {
+  constructor(row=-1, col=-1) {
+    this.row = row;
+    this.col = col;
+  }
+  value() {
+    return this.row >=0 && this.col >= 0 ? Grid[this.row][this.col] : '.';
+  }
 
-function N(map, row, col) {
-  if (row < 1) return '.';
-  return map[row-1][col];
-}
+  NW() {
+    if (this.row < 1 || this.col < 1) return new Coord();
+    return new Coord(this.row-1,this.col-1);
+  }
 
-function NE(map, row, col) {
-  if (row < 1 || col >= map[row].length-1) return '.';
-  return map[row-1][col+1];
-}
-
-function SW(map, row, col) {
-  if (row >= map.length-1 || col < 1) return '.';
-  return map[row+1][col-1];
-}
-
-function S(map, row, col) {
-  if (row >= map.length-1) return '.';
-  return map[row+1][col];
-}
-
-function SE(map, row, col) {
-  if (row >= map.length-1 || col >= map[row].length-1) return '.';
-  return map[row+1][col+1];
-}
-
-function E(map, row, col) {
-  if (col >= map[row].length-1) return '.';
-  return map[row][col+1];
-}
-
-function W(map, row, col) {
-  if (col < 1) return '.';
-  return map[row][col-1];
+  N() {
+    if (this.row < 1) return new Coord();
+    return new Coord(this.row-1,this.col);
+  }
+  
+  NE() {
+    if (this.row < 1 || this.col >= Grid[this.row].length-1) return new Coord();
+    return new Coord(this.row-1,this.col+1);
+  }
+  
+  SW() {
+    if (this.row >= Grid.length-1 || this.col < 1) return new Coord();
+    return new Coord(this.row+1,this.col-1);
+  }
+  
+  S() {
+    if (this.row >= Grid.length-1) return new Coord();
+    return new Coord(this.row+1,this.col);
+  }
+  
+  SE() {
+    if (this.row >= Grid.length-1 || this.col >= Grid[this.row].length-1) return new Coord();
+    return new Coord(this.row+1,this.col+1);
+  }
+  
+  E() {
+    if (this.col >= Grid[this.row].length-1) return new Coord();
+    return new Coord(this.row,this.col+1);
+  }
+  
+  W() {
+    if (this.col < 1) return new Coord();
+    return new Coord(this.row,this.col-1);
+  }
 }
 //#endregion
 
@@ -81,53 +89,34 @@ function W(map, row, col) {
 function isDigit(char) {
   return /[0-9]/.test(char);
 }
-function isSymbol(char) {
-  if (char == '.') return false;
-  if (isDigit(char)) return false;
-  return true;
-}
 function isGear(char) {
-  return char == '*';
+  return char === '*';
 }
-function isAlreadyHandled(m,r,c) {
-  return isDigit(N(m,r,c)) || isDigit(W(m,r,c));
-}
-function adjacentSymbol(m,r,c) {
-  return isSymbol(NW(m,r,c))
-  || isSymbol(N(m,r,c))
-  || isSymbol(NE(m,r,c))
-  || isSymbol(W(m,r,c))
-  || isSymbol(E(m,r,c))
-  || isSymbol(SW(m,r,c))
-  || isSymbol(S(m,r,c))
-  || isSymbol(SE(m,r,c))
-}
-function adjacentNumbers(m,r,c) {
+function adjacentNumbers(coord) {
   const numbers = new Set();
-
-  if (isDigit(NW(m,r,c))) {
-    numbers.add(getNumberIndex(m,r-1,c-1));
+  if (isDigit(coord.NW().value())) {
+    numbers.add(getNumberIndex(coord.NW()));
   }
-  if (isDigit(N(m,r,c))) {
-    numbers.add(getNumberIndex(m,r-1,c));
+  if (isDigit(coord.N().value())) {
+    numbers.add(getNumberIndex(coord.N()));
   }
-  if (isDigit(NE(m,r,c))) {
-    numbers.add(getNumberIndex(m,r-1,c+1));
+  if (isDigit(coord.NE().value())) {
+    numbers.add(getNumberIndex(coord.NE()));
   }
-  if (isDigit(W(m,r,c))) {
-    numbers.add(getNumberIndex(m,r,c-1));
+  if (isDigit(coord.W().value())) {
+    numbers.add(getNumberIndex(coord.W()));
   }
-  if (isDigit(E(m,r,c))) {
-    numbers.add(getNumberIndex(m,r,c+1));
+  if (isDigit(coord.E().value())) {
+    numbers.add(getNumberIndex(coord.E()));
   }
-  if (isDigit(SW(m,r,c))) {
-    numbers.add(getNumberIndex(m,r+1,c-1));
+  if (isDigit(coord.SW().value())) {
+    numbers.add(getNumberIndex(coord.SW()));
   }
-  if (isDigit(S(m,r,c))) {
-    numbers.add(getNumberIndex(m,r+1,c));
+  if (isDigit(coord.S().value())) {
+    numbers.add(getNumberIndex(coord.S()));
   }
-  if (isDigit(SE(m,r,c))) {
-    numbers.add(getNumberIndex(m,r+1,c+1));
+  if (isDigit(coord.SE().value())) {
+    numbers.add(getNumberIndex(coord.SE()));
   }
 
   return numbers;
@@ -135,21 +124,25 @@ function adjacentNumbers(m,r,c) {
 //#endregion
 
 //#region Parse Numbers
-function getNumber(m,r,c) {
-  let total = parseInt(m[r][c]);
-  let offset = 0;
-  while (isDigit(E(m,r,c+offset))) {
-    offset++;
+function getNumber(coord) {
+  if (partNums.has(`${coord.row},${coord.col}`)) return partNums.get(`${coord.row},${coord.col}`);
+  let total = parseInt(coord.value());
+  let newCoord = coord.E();
+  while (isDigit(newCoord.value())) {
     total *= 10;
-    total += parseInt(m[r][c+offset]);
+    total += parseInt(newCoord.value());
+    newCoord = newCoord.E();
   }
+  partNums.set(`${coord.row},${coord.col}`,total);
   return total;
 }
-function getNumberIndex(m,r,c) {
-  let offset = 0;
-  while (isDigit(W(m,r,c-offset))) {
-    offset++;
+function getNumberIndex(coord) {
+  let newCoord = new Coord(coord.row, coord.col);
+  while (isDigit(newCoord.W().value())) {
+    newCoord = newCoord.W();
   }
-  return `${r},${c-offset}`;
+  const key =  `${newCoord.row},${newCoord.col}`;
+  if (!partNums.has(key)) partNums.set(key, getNumber(newCoord));
+  return key;
 }
 //#endregion
