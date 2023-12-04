@@ -86,31 +86,12 @@ function isGear(char) {
 }
 function adjacentNumbers(coord) {
   const numbers = new Set();
-  if (isDigit(coord.NW().value())) {
-    numbers.add(getNumberIndex(coord.NW()));
+  const directions = [coord.NW(), coord.N(), coord.NE(), coord.W(), coord.E(), coord.SW(), coord.S(), coord.SE()];
+  for (direction of directions) {
+    if (isDigit(direction.value())) {
+      numbers.add(getNumberIndex(direction));
+    }
   }
-  if (isDigit(coord.N().value())) {
-    numbers.add(getNumberIndex(coord.N()));
-  }
-  if (isDigit(coord.NE().value())) {
-    numbers.add(getNumberIndex(coord.NE()));
-  }
-  if (isDigit(coord.W().value())) {
-    numbers.add(getNumberIndex(coord.W()));
-  }
-  if (isDigit(coord.E().value())) {
-    numbers.add(getNumberIndex(coord.E()));
-  }
-  if (isDigit(coord.SW().value())) {
-    numbers.add(getNumberIndex(coord.SW()));
-  }
-  if (isDigit(coord.S().value())) {
-    numbers.add(getNumberIndex(coord.S()));
-  }
-  if (isDigit(coord.SE().value())) {
-    numbers.add(getNumberIndex(coord.SE()));
-  }
-
   return numbers;
 }
 //#endregion

@@ -20,13 +20,9 @@ function processLines(lines) {
     }
     picks = picks.split(' ');
     for (pick of picks) {
-      if (winnersSet.has(pick)) {
-        val++;
-      }
+      if (winnersSet.has(pick)) val++;
     }
-    for (;val > 0; val--) {
-      multiplier[game+val] += multiplier[game];
-    }
+    for (;val > 0; val--) multiplier[game+val] += multiplier[game];
     total += multiplier[game];
     game++;
   }
