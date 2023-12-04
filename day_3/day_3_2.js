@@ -2,16 +2,8 @@ var fs = require('fs');
 let partNums = new Map();
 let Grid;
 
-function makeGrid(data) {
-  let g = data.split('\r\n');
-  for (row in g) {
-    g[row] = g[row].split('');
-  }
-  return g;
-}
-
 fs.readFile('./day_3.dat', 'utf8', (err, data) => {
-  Grid = makeGrid(data);
+  Grid = data.split('\r\n');
 
   let total = 0;
   // Find all gears, determine how many numbers they touch, compute gear ratio
