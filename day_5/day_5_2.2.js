@@ -1,3 +1,12 @@
+/* Backwards Traversal:
+   Invert every interval and then traverse the mappings backwards (location -> seed)
+   Check if the seed number you arrive at exists within the range of seeds to test
+
+   This makes the problem scale off what the actual answer will be,
+   rather than the number of seeds to check, but for any reasonable
+   set of potential values should be better overall.
+*/
+
 var fs = require('fs');
 
 const phases = [

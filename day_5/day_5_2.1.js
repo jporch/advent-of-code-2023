@@ -1,4 +1,7 @@
 var fs = require('fs');
+/* Naive Solution:
+   Build the mapping and then traverse it for every seed, keeping lowest location value 
+*/
 
 fs.readFile('./day_5_simple.dat', 'utf8', (err, data) => {
   let maps = data.split('\r\n\r\n');
