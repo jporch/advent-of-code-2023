@@ -8,6 +8,7 @@ fs.readFile('./day_5.dat', 'utf8', (err, data) => {
 });
 
 function processMaps(maps) {
+  const startTime = new Date().getTime();
   let total = Number.MAX_SAFE_INTEGER;
   let lookup = new Map();
   let seeds;
@@ -16,7 +17,6 @@ function processMaps(maps) {
     if (map.split('\n').length == 1) {
       seeds = map.split(' ');
       label = seeds.shift();
-      seeds = seeds.sort();
       continue;
     } 
     [label, mapping] = map.split(':\r\n');
@@ -24,12 +24,27 @@ function processMaps(maps) {
     mapping = new Mapping(mapping);
     lookup.set(label,mapping);
   }
-  for (seed of seeds) {
-    let val = seed;
-    for ([k, v] of lookup) {
-      val = v.convert(val);
+  let count = 0;
+  for (let s = 1; s < seeds.length; s+=2) {
+    count += parseInt(seeds[s]);
+  }
+  console.log('Total seeds: ',count);
+  let seedsProcessed = 0;
+  for (let s = 0; s < seeds.length; s+=2) {
+    let minSeed = parseInt(seeds[s]);
+    let maxSeed = minSeed + parseInt(seeds[s+1]);
+    for (let i = minSeed; i < maxSeed; i++){
+      let val = i;
+      //console.log(i);
+      for ([k, v] of lookup) {
+        let oldVal = val;
+        val = v.convert(val);
+        //if (oldVal !== val) console.log('  ',k,':',oldVal,'-->',val);
+      }
+      total = Math.min(val, total);
+      seedsProcessed++;
+      if (seedsProcessed%10000 === 0) console.log(count - seedsProcessed,' to go... (',(new Date().getTime()-startTime)/1000,'s  ',seedsProcessed/count*100,'%)');
     }
-    total = Math.min(val, total);
   }
   return total;
 }
@@ -65,7 +80,11 @@ class Interval {
   }
 
   includes(input) {
-    return input >= this.source && input < this.end;
+    let flag = input >= this.source && input < this.end;
+    if (flag) {
+      //console.log('~~~',this.source, this.end, this.adjustment);
+    }
+    return flag;
   }
 
   convert(input) {
