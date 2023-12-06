@@ -2,13 +2,15 @@ var fs = require('fs');
 
 fs.readFile('./day_5_simple.dat', 'utf8', (err, data) => {
   let maps = data.split('\r\n\r\n');
+  const startTime = new Date().getTime();
   const total = processMaps(maps);
+  console.log('Total time: ',(new Date().getTime()-startTime)/1000,'s');
 
   console.log(`Answer: ${total}`);
 });
 
 function processMaps(maps) {
-  const startTime = new Date().getTime();
+
   let total = Number.MAX_SAFE_INTEGER;
   let lookup = new Map();
   let seeds;
@@ -44,7 +46,6 @@ function processMaps(maps) {
       if (seedsProcessed%100000 === 0) console.log(count - seedsProcessed,' to go... (',(new Date().getTime()-startTime)/1000,'s  ',seedsProcessed/count*100,'%)');
     }
   }
-  console.log('Total time: ',(new Date().getTime()-startTime)/1000,'s');
   return total;
 }
 
