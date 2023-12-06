@@ -10,7 +10,7 @@ const phases = [
   'humidity-to-location map',
 ].reverse();
 
-fs.readFile('./day_5.dat', 'utf8', (err, data) => {
+fs.readFile('./day_5_simple.dat', 'utf8', (err, data) => {
   let maps = data.split('\r\n\r\n');
   const startTime = new Date().getTime();
   const total = processMaps(maps);
@@ -21,19 +21,19 @@ fs.readFile('./day_5.dat', 'utf8', (err, data) => {
 
 function processMaps(maps) {
   let total = Number.MAX_SAFE_INTEGER;
-  let lookup = new Map();
+  let mapping = new Mapping();
   let seeds;
   for (map of maps) {
-    let label, mapping;
+    let label, layer;
     if (map.split('\n').length == 1) {
       seeds = map.split(' ');
       label = seeds.shift();
       continue;
     } 
-    [label, mapping] = map.split(':\r\n');
-    mapping = mapping.split('\r\n');
-    mapping = new Mapping(mapping);
-    lookup.set(label,mapping);
+    [label, layer] = map.split(':\r\n');
+    layer = layer.split('\r\n');
+    layer = new Layer(layer);
+    mapping.add(label,layer);
   }
 
   let count = 0;
@@ -42,15 +42,12 @@ function processMaps(maps) {
     count += parseInt(seeds[s+1]);
     seedIntervals.push(`${seeds[s]} ${seeds[s]} ${seeds[s+1]}`);
   }
-  seedIntervals = new Mapping(seedIntervals);
+  seedIntervals = new Layer(seedIntervals);
   console.log('Total seeds: ',count);
 
   let seedsProcessed = 0;
   for (let i = 0; i < Number.MAX_SAFE_INTEGER; ++i) {
-    let val = i;
-    for (p in phases) {
-      val = lookup.get(phases[p]).convert(val);
-    }
+    let val = mapping.convert(i, phases);
     if (seedIntervals.includes(val)) return i;
     total = Math.min(val, total);
     seedsProcessed++;
@@ -60,6 +57,23 @@ function processMaps(maps) {
 }
 
 class Mapping {
+  constructor() {
+    this.layers = new Map();
+  }
+
+  add(label, layer) {
+    this.layers.set(label,layer);
+  }
+
+  convert(input, transitions) {
+    for (let t in transitions) {
+      input = this.layers.get(transitions[t]).convert(input);
+    }
+    return input;
+  }
+}
+
+class Layer {
   constructor(ranges) {
     this.intervals = [];
     for (let r in ranges) {
