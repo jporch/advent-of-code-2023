@@ -35,11 +35,9 @@ function processMaps(maps) {
     let maxSeed = minSeed + parseInt(seeds[s+1]);
     for (let i = minSeed; i < maxSeed; i++){
       let val = i;
-      //console.log(i);
       for ([k, v] of lookup) {
         let oldVal = val;
         val = v.convert(val);
-        //if (oldVal !== val) console.log('  ',k,':',oldVal,'-->',val);
       }
       total = Math.min(val, total);
       seedsProcessed++;
@@ -80,11 +78,7 @@ class Interval {
   }
 
   includes(input) {
-    let flag = input >= this.source && input < this.end;
-    if (flag) {
-      //console.log('~~~',this.source, this.end, this.adjustment);
-    }
-    return flag;
+   return input >= this.source && input < this.end;
   }
 
   convert(input) {
