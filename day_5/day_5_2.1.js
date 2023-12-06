@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-fs.readFile('./day_5.dat', 'utf8', (err, data) => {
+fs.readFile('./day_5_short.dat', 'utf8', (err, data) => {
   let maps = data.split('\r\n\r\n');
   const total = processMaps(maps);
 
@@ -41,9 +41,10 @@ function processMaps(maps) {
       }
       total = Math.min(val, total);
       seedsProcessed++;
-      if (seedsProcessed%10000 === 0) console.log(count - seedsProcessed,' to go... (',(new Date().getTime()-startTime)/1000,'s  ',seedsProcessed/count*100,'%)');
+      if (seedsProcessed%100000 === 0) console.log(count - seedsProcessed,' to go... (',(new Date().getTime()-startTime)/1000,'s  ',seedsProcessed/count*100,'%)');
     }
   }
+  console.log('Total time: ',(new Date().getTime()-startTime)/1000,'s');
   return total;
 }
 
