@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-fs.readFile('./day_5_short.dat', 'utf8', (err, data) => {
+fs.readFile('./day_5_simple.dat', 'utf8', (err, data) => {
   let maps = data.split('\r\n\r\n');
   const total = processMaps(maps);
 
